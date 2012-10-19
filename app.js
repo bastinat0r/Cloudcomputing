@@ -25,7 +25,7 @@ app.get('/', function(req, res){
   res.render('home', req.session.user);
 });
 app.get('/users', function(req, res) {
-	res.render('users');
+	res.render('users', req.session.user);
 });
 app.get('/login', function(req, res) {
 	res.render('login');
