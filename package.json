@@ -1,0 +1,11 @@
+{
+	"name" : "hello-cloud",
+	"version" : "3",
+	"author" : "bastinat0r <bastinat0r@bastinat0r.de>",
+	"description" : "first assignment of the cloudcomputing-exercise",
+	"dependecies" : [],
+	"license" : "beerware",
+	"engines" : {
+		"node" : ">= 8.11"
+		},
+}

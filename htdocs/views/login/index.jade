@@ -1,0 +1,13 @@
+!!!
+include head
+body
+	include ../header
+	.container
+		h1 Hello Cloud
+		h2 Login
+		form(action="/login", method="POST")
+			input(type="text", name="name", placeholder="username")
+			input(type="password", name="pass", plaeceholder="password")
+			input(type="submit")
+
+			

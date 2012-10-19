@@ -1,0 +1,12 @@
+!!!
+include head
+body
+	include ../header
+	.container
+		h1 Hello Cloud
+		h2 Register new User
+		form(action="/register", method="POST")
+			input(type="text", name="name", placeholder="username")
+			input(type="text", name="mail", placeholder="foo@bar.baz")
+			input(type="password", name="pass", placeholder="password")
+			input(type="submit")
