@@ -25,7 +25,7 @@ app.get('/', function(req, res){
   res.render('home', req.session.user);
 });
 app.get('/users', function(req, res) {
-	res.render('users', {'name' : 'foobar'});
+	res.render('users');
 });
 app.get('/login', function(req, res) {
 	res.render('login');
@@ -35,7 +35,7 @@ app.get('/register', function(req, res) {
 });
 app.get('/profile', function(req, res) {
 	if(req.session.user) {
-		res.render('profile', {name : req.session.user});
+		res.render('profile', req.session.user);
 	} else {
 		res.redirect('login');
 	}
@@ -61,7 +61,7 @@ console.log('Express app started on port 3000');
 function auth(req, res) {
 	validateUser({name : req.body.name, pass: req.body.pass}, function(valid) {
 		if(valid) {
-			req.session.user = req.body.name;
+			req.session.user = { name : req.body.name };
 			res.redirect('profile');
 			//res.render('profile', {name : req.session.user});
 		} else {
