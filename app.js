@@ -1,6 +1,5 @@
 var express = require('express');
 var util = require('util');
-var querystring = require('querystring');
 
 var pub = __dirname + '/htdocs/public';
 
