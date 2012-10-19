@@ -4,7 +4,7 @@
 	"author" : "bastinat0r <bastinat0r@bastinat0r.de>",
 	"description" : "first assignment of the cloudcomputing-exercise",
 	"dependecies" : {
-			"express" : "3.0.0rc5"
+			"express" : "3.0.0rc5",
 			"jade" : "0.27.6"
 		},
 	"license" : "beerware",
