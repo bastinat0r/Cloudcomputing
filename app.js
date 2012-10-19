@@ -22,7 +22,7 @@ app.set('view engine', 'jade');
 app.set('views', __dirname + '/htdocs/views');
 
 app.get('/', function(req, res){
-  res.render('home');
+  res.render('home', req.session.user);
 });
 app.get('/users', function(req, res) {
 	res.render('users', {'name' : 'foobar'});
