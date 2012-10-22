@@ -55,7 +55,7 @@ app.post('/register', function(req, res) {
 });
 
 
-app.listen(process.env.port || 3000);
+app.listen(process.env.port || 80);
 console.log('Express app started on port 3000');
 
 function auth(req, res) {
