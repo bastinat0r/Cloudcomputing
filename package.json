@@ -1,14 +1,17 @@
 {
   "name": "hello-cloud",
   "description": "first assignment of the cloud-computing lecture",
-  "version": "2.0.0",
+  "version": "2.0.0-1",
   "private": true,
-  "engines" : {
-		"node" : "=0.6.20"
-	},
+  "engines": {
+    "node": "=0.8.x"
+  },
   "dependencies": {
-   "express": "3.0.0rc5",
-		"jade" : "0.27.6"
+    "express": "3.0.0rc5",
+    "jade": "0.27.6"
+  },
+  "subdomain": "bastinat0r",
+  "scripts": {
+    "start": "app.js"
   }
-
 }
