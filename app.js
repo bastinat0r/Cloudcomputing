@@ -1,10 +1,41 @@
 var express = require('express');
 var util = require('util');
+var mongoose = require('mongoose'),
+		Schema = mongoose.Schema;
+var mongooseAuth = require('mongoose-auth');
 
 var pub = __dirname + '/htdocs/public';
 
 
 var app = express();
+
+var userSchema = new Schema({});
+var User;
+
+userSchema.plugin(mongooseAuth, {
+	everymodule : {
+		everyauth : {
+			User : function() {
+				return User;
+			}
+		}
+	},
+	password : {
+		everyauth : {
+			getLoginPath : '/login',
+			postLoginPath : '/login',
+			loginView : 'login',
+			getRegisterPath : '/register',
+			postRegisterPath: '/register',
+			registerView : 'register',
+			loginSuccessRedirect : '/profile',
+			registerSuccessRedirect: '/profile'
+
+		}
+	}
+});
+
+
 var MemStore = express.session.MemoryStore;
 
 app.use(express.static(pub)); // folder for static shit like css
@@ -55,11 +86,11 @@ app.post('/register', function(req, res) {
 });
 
 
-app.listen(process.env.port || 80);
+app.listen(process.env.port || 3000);
 console.log('Express app started on port 3000');
 
 function auth(req, res) {
-	validateUser({name : req.body.name, pass: req.body.pass}, function(valid) {
+	userDB.validate({name : req.body.name, pass: req.body.pass}, function(valid) {
 		if(valid) {
 			req.session.user = { name : req.body.name };
 			res.redirect('profile');
@@ -70,10 +101,6 @@ function auth(req, res) {
 		}
 	});
 };
-
-function validateUser(user, cb) {
-	cb(user.name == 'foo' && user.pass == 'bar');
-}
 
 function validateCookie(cb) {
 	cb('foo');
