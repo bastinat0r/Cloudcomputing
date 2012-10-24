@@ -1,5 +1,6 @@
 var express = require('express');
 var util = require('util');
+var userDB = require('./db.js');
 
 var pub = __dirname + '/htdocs/public';
 
@@ -53,7 +54,12 @@ app.post('/login', function(req, res) {
 });
 
 app.post('/register', function(req, res) {
-	auth(req, res);
+	userDB.register({name : req.body.name, pass : req.body.pass, mail  : req.body.mail}, function(success) {
+		if(success) 
+			require('timers').setTimeout(auth, 300, req, res);
+		else
+			res.render('register', {error : 'name already in use'});
+	});
 });
 
 

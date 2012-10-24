@@ -5,6 +5,8 @@ body
 	.container
 		h1 Hello Cloud
 		h2 Register new User
+		if typeof(err) !== "undefined"
+			{err}
 		form(action="/register", method="POST")
 			input(type="text", name="name", placeholder="username")
 			input(type="text", name="mail", placeholder="foo@bar.baz")
