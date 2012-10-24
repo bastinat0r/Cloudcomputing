@@ -1,15 +1,15 @@
 {
   "name": "hello-cloud",
   "description": "first assignment of the cloud-computing lecture",
-  "version": "2.0.0-4",
+  "version": "2.0.0-6",
   "private": true,
   "engines": {
-    "node": ">=0.6.1"
+    "node": "=0.6.x"
   },
   "dependencies": {
     "express": "3.0.0rc5",
     "jade": "0.27.6",
-		"mongoose" : "3.x"
+    "mongoose": "3.x"
   },
   "subdomain": "bastinat0r",
   "scripts": {
