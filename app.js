@@ -1,39 +1,10 @@
 var express = require('express');
 var util = require('util');
-var mongoose = require('mongoose'),
-		Schema = mongoose.Schema;
-var mongooseAuth = require('mongoose-auth');
 
 var pub = __dirname + '/htdocs/public';
 
 
 var app = express();
-
-var userSchema = new Schema({});
-var User;
-
-userSchema.plugin(mongooseAuth, {
-	everymodule : {
-		everyauth : {
-			User : function() {
-				return User;
-			}
-		}
-	},
-	password : {
-		everyauth : {
-			getLoginPath : '/login',
-			postLoginPath : '/login',
-			loginView : 'login',
-			getRegisterPath : '/register',
-			postRegisterPath: '/register',
-			registerView : 'register',
-			loginSuccessRedirect : '/profile',
-			registerSuccessRedirect: '/profile'
-
-		}
-	}
-});
 
 
 var MemStore = express.session.MemoryStore;
