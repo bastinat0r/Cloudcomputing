@@ -1,12 +1,15 @@
 var express = require('express');
 var util = require('util');
 var userDB = require('./db.js');
-
+var fs = require('fs');
+var https = require('https');
+var http = require('http');
 var pub = __dirname + '/htdocs/public';
 
+var httpPort = (process.env.port || 3000);
+var httpsPort = 4000;
 
 var app = express();
-
 
 var MemStore = express.session.MemoryStore;
 
@@ -16,34 +19,62 @@ app.use(express.errorHandler());
 app.use(express.cookieParser('manny is cool'));
 app.use(express.bodyParser());
 //app.use(express.methodOverride());
-app.use(express.session({secret: 'alessios', store: MemStore({
-	reapInterval: 60000 * 10
-})}));
+var store = MemStore({reapInterval: 60000 * 10});
+app.use(express.session({secret: 'alessios', store : store}));
 app.use(app.router);
 
 app.set('view engine', 'jade');
 app.set('views', __dirname + '/htdocs/views');
 
 app.get('/', function(req, res){
-  res.render('home', req.session.user);
+	if(typeof(req.headers["https-proxy"]) == "undefined") {
+		req.session.secure = false;		
+	}
+  res.render('home', req.session);
 });
 app.get('/users', function(req, res) {
-	res.render('users', req.session.user);
+	if(typeof(req.headers["https-proxy"]) == "undefined") {
+		req.session.secure = false;		
+	}
+	res.render('users', req.session);
 });
 app.get('/login', function(req, res) {
+	if(typeof(req.headers["https-proxy"]) == "undefined") {
+		req.session.secure = false;		
+	}
 	res.render('login');
 });
 app.get('/register', function(req, res) {
+	if(typeof(req.headers["https-proxy"]) == "undefined") {
+		req.session.secure = false;		
+	}
 	res.render('register');
 });
 app.get('/profile', function(req, res) {
-	if(req.session.user) {
-		res.render('profile', req.session.user);
+	if(typeof(req.headers["https-proxy"]) == "undefined") {
+		req.session.secure = false;		
+	}
+	if(req.session.name) {
+		res.render('profile', req.session);
 	} else {
 		res.redirect('login');
 	}
 });
+app.get('/secure', function(req, res) {
+	if(typeof(req.headers["https-proxy"]) == "undefined") {
+		req.session.secure = false;		
+	}
+	if(req.session.name && req.session.secure) {
+		res.render('profile', req.session);
+	} else {
+		res.redirect('login');
+	}
+});
+
 app.get('/logout', function(req, res) {
+	if(typeof(req.headers["https-proxy"]) == "undefined") {
+		req.session.secure = false;		
+	}
 	req.session.destroy(function() {
 		res.redirect('/');
 	});
@@ -63,15 +94,19 @@ app.post('/register', function(req, res) {
 });
 
 
-app.listen(process.env.port || 80);
-console.log('Express app started on port 3000');
+app.listen(httpPort);
+console.log('Express app started on port ' + httpPort);
 
 function auth(req, res) {
 	userDB.validate({name : req.body.name, pass: req.body.pass}, function(valid) {
 		if(valid) {
-			req.session.user = { name : req.body.name };
+			util.puts(req.session.id);
+			store.regenerate(req);
+			util.puts(req.session.id);
+			req.session.name = req.body.name;
+			req.session.secure = true;
 			res.redirect('profile');
-			//res.render('profile', {name : req.session.user});
+			//res.render('profile', {name : r<F3>eq.session.user});
 		} else {
 			res.writeHead(403);
 			res.end('403 - Forbidden!');
@@ -82,3 +117,41 @@ function auth(req, res) {
 function validateCookie(cb) {
 	cb('foo');
 }
+
+cert = {
+	key : fs.readFileSync('server.key'),
+	cert : fs.readFileSync('server.crt')
+}
+
+var proxy_srv = https.createServer(cert, function (req, res) {
+	var proxy_opts = {
+		path : req.url,
+		port : httpPort,
+		host : "localhost",
+		method : req.method,
+		headers : req.headers
+	}
+	proxy_opts.headers["https-proxy"] = "https";
+	//util.puts(JSON.stringify(proxy_opts));
+	var proxy_req = http.request(proxy_opts);
+	proxy_req.on('response', function(proxy_res) {
+		res.writeHead(proxy_res.statusCode, proxy_res.headers);
+		proxy_res.on('data', function(chunk) {
+			res.write(chunk);
+		});
+		proxy_res.on('end', function() {
+			res.end();
+		});
+	});
+
+	req.on('data', function(chunk) {
+		proxy_req.write(chunk);
+	});
+
+	req.on('end', function() {
+		proxy_req.end();
+	});
+});
+proxy_srv.listen(httpsPort);
+proxy_srv.on('error', util.puts);
+util.puts('https on port ' + httpsPort);
