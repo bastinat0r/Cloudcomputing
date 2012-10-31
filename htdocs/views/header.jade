@@ -1,23 +1,33 @@
 header
-	if typeof(name) !== "undefined" && typeof(secure) !== "undefined"
-		h1 #{name} | #{secure}
+	if typeof(session) !== "undefined"
+		if typeof(session.name) !== "undefined"
+			h1 #{session.name}
+		if typeof(session.secure) !== "undefined"
+			i the session is currently marked as 
+				b #{session.secure}
 	.nav-header
 		.nav
 			ul
 				li
-					a(href="/") Home
+					a(href="#{httpBaseUrl}/") Home
 				li
 					a(href="/users") Users
 				
-				if typeof(name) !== "undefined" 
-					li
-						a(href="/logout") Logout
-					li
-						a(href="/secure") Secure Area
-					li
-						a(href="/profile") Profile
+				if typeof(session) !== "undefined" 
+					if typeof(session.name) !== "undefined"
+						li
+							a(href="#{httpBaseUrl}/logout") Logout
+						li
+							a(href="#{httpsBaseUrl}/secure") Secure Area
+						li
+							a(href="#{httpsBaseUrl}/profile") Profile
+					else
+						li
+							a(href="#{httpsBaseUrl}/register") Register
+						li
+							a(href="#{httpsBaseUrl}/login") Login
 				else
 					li
-						a(href="/register") Register
+						a(href="#{httpsBaseUrl}/register") Register
 					li
-						a(href="/login") Login
+						a(href="#{httpsBaseUrl}/login") Login

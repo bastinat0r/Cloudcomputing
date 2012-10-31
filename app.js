@@ -12,6 +12,8 @@ var httpsPort = 4000;
 var app = express();
 
 var MemStore = express.session.MemoryStore;
+var httpBaseUrl = "http://localhost:3000";
+var httpsBaseUrl = "https://localhost:4000";
 
 app.use(express.static(pub)); // folder for static shit like css
 app.use(express.favicon());		// ignore chrome-favicon-requests
@@ -30,32 +32,32 @@ app.get('/', function(req, res){
 	if(typeof(req.headers["https-proxy"]) == "undefined") {
 		req.session.secure = false;		
 	}
-  res.render('home', req.session);
+  res.render('home', {session : req.session, httpBaseUrl : httpBaseUrl, httpsBaseUrl : httpsBaseUrl});
 });
 app.get('/users', function(req, res) {
 	if(typeof(req.headers["https-proxy"]) == "undefined") {
 		req.session.secure = false;		
 	}
-	res.render('users', req.session);
+	res.render('users', {session : req.session, httpBaseUrl : httpBaseUrl, httpsBaseUrl : httpsBaseUrl});
 });
 app.get('/login', function(req, res) {
 	if(typeof(req.headers["https-proxy"]) == "undefined") {
 		req.session.secure = false;		
 	}
-	res.render('login');
+	res.render('login', {httpBaseUrl : httpBaseUrl, httpsBaseUrl : httpsBaseUrl});
 });
 app.get('/register', function(req, res) {
 	if(typeof(req.headers["https-proxy"]) == "undefined") {
 		req.session.secure = false;		
 	}
-	res.render('register');
+	res.render('register', {httpBaseUrl : httpBaseUrl, httpsBaseUrl : httpsBaseUrl});
 });
 app.get('/profile', function(req, res) {
 	if(typeof(req.headers["https-proxy"]) == "undefined") {
 		req.session.secure = false;		
 	}
 	if(req.session.name) {
-		res.render('profile', req.session);
+		res.render('profile', {session : req.session, httpBaseUrl : httpBaseUrl, httpsBaseUrl : httpsBaseUrl});
 	} else {
 		res.redirect('login');
 	}
@@ -65,7 +67,7 @@ app.get('/secure', function(req, res) {
 		req.session.secure = false;		
 	}
 	if(req.session.name && req.session.secure) {
-		res.render('profile', req.session);
+		res.render('profile', {session : req.session, httpBaseUrl : httpBaseUrl, httpsBaseUrl : httpsBaseUrl});
 	} else {
 		res.redirect('login');
 	}
@@ -89,7 +91,7 @@ app.post('/register', function(req, res) {
 		if(success) 
 			require('timers').setTimeout(auth, 300, req, res);
 		else
-			res.render('register', {error : 'name already in use'});
+			res.render('register', {error : 'name already in use', httpBaseUrl : httpBaseUrl, httpsBaseUrl : httpsBaseUrl});
 	});
 });
 
@@ -101,11 +103,13 @@ function auth(req, res) {
 	userDB.validate({name : req.body.name, pass: req.body.pass}, function(valid) {
 		if(valid) {
 			util.puts(req.session.id);
-			store.regenerate(req);
-			util.puts(req.session.id);
-			req.session.name = req.body.name;
-			req.session.secure = true;
-			res.redirect('profile');
+			req.session.regenerate(function(err) {
+			
+				util.puts(req.session.id);
+				req.session.name = req.body.name;
+				req.session.secure = true;
+				res.redirect('profile');
+			});
 			//res.render('profile', {name : r<F3>eq.session.user});
 		} else {
 			res.writeHead(403);
