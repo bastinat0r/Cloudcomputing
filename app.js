@@ -6,14 +6,14 @@ var https = require('https');
 var http = require('http');
 var pub = __dirname + '/htdocs/public';
 
-var httpPort = (process.env.port || 3000);
-var httpsPort = 4000;
+var httpPort = (process.env.port || 80);
+var httpsPort = 443;
 
 var app = express();
 
 var MemStore = express.session.MemoryStore;
-var httpBaseUrl = "http://localhost:3000";
-var httpsBaseUrl = "https://localhost:4000";
+var httpBaseUrl = "http://bastinat0r.azurewebsites.net";
+var httpsBaseUrl = "https://bastinat0r.azurewebsites.net";
 
 app.use(express.static(pub)); // folder for static shit like css
 app.use(express.favicon());		// ignore chrome-favicon-requests
