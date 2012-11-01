@@ -12,8 +12,8 @@ var httpsPort = 443;
 var app = express();
 
 var MemStore = express.session.MemoryStore;
-var httpBaseUrl = "http://bastinat0r.azurewebsites.net";
-var httpsBaseUrl = "https://bastinat0r.azurewebsites.net";
+var httpBaseUrl = "";
+var httpsBaseUrl = "";
 
 app.use(express.static(pub)); // folder for static shit like css
 app.use(express.favicon());		// ignore chrome-favicon-requests
