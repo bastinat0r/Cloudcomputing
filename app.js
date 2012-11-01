@@ -6,14 +6,14 @@ var https = require('https');
 var http = require('http');
 var pub = __dirname + '/htdocs/public';
 
-var httpPort = (process.env.port || 80);
-var httpsPort = 443;
+var httpPort = (process.env.port || 3000);
+var httpsPort = 4000;
 
 var app = express();
 
 var MemStore = express.session.MemoryStore;
-var httpBaseUrl = "";
-var httpsBaseUrl = "";
+var httpBaseUrl = "http://localhost:3000";
+var httpsBaseUrl = "https://localhost:4000";
 
 app.use(express.static(pub)); // folder for static shit like css
 app.use(express.favicon());		// ignore chrome-favicon-requests
@@ -22,7 +22,7 @@ app.use(express.cookieParser('manny is cool'));
 app.use(express.bodyParser());
 //app.use(express.methodOverride());
 var store = MemStore({reapInterval: 60000 * 10});
-app.use(express.session({secret: 'alessios', store : store}));
+app.use(express.session({cookie : {path: '/', secure: true}, secret: 'alessios', store : store}));
 app.use(app.router);
 
 app.set('view engine', 'jade');
@@ -32,7 +32,13 @@ app.get('/', function(req, res){
 	if(typeof(req.headers["https-proxy"]) == "undefined") {
 		req.session.secure = false;		
 	}
-  res.render('home', {session : req.session, httpBaseUrl : httpBaseUrl, httpsBaseUrl : httpsBaseUrl});
+	if(typeof(req.cookies) !== "undefined") {
+		if(typeof(req.cookies.username) !== "undefined")
+			res.render('home', {session: {name: req.cookies.username},httpBaseUrl : httpBaseUrl, httpsBaseUrl :  httpsBaseUrl});
+//		res.cookie('username', res.cookies.username,  {secure: false, maxAge: 36000 });
+	}
+	else
+		res.render('home', {session : req.session, httpBaseUrl : httpBaseUrl, httpsBaseUrl : httpsBaseUrl});
 });
 app.get('/users', function(req, res) {
 	if(typeof(req.headers["https-proxy"]) == "undefined") {
@@ -108,6 +114,7 @@ function auth(req, res) {
 				util.puts(req.session.id);
 				req.session.name = req.body.name;
 				req.session.secure = true;
+				res.cookie('username', req.session.name,  {secure: false, maxAge: 36000 });
 				res.redirect('profile');
 			});
 			//res.render('profile', {name : r<F3>eq.session.user});
@@ -128,6 +135,9 @@ cert = {
 }
 
 var proxy_srv = https.createServer(cert, function (req, res) {
+	
+	app.handle(req,res);
+	/*
 	var proxy_opts = {
 		path : req.url,
 		port : httpPort,
@@ -154,7 +164,7 @@ var proxy_srv = https.createServer(cert, function (req, res) {
 
 	req.on('end', function() {
 		proxy_req.end();
-	});
+	}); */
 });
 proxy_srv.listen(httpsPort);
 proxy_srv.on('error', util.puts);
